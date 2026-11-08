@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#11141b">
+<title>THEPKUB 4WD</title>
+<style>
+:root{--bg:#11141b;--card:#1b202b;--card2:#262d3c;--deep:#0d1016;--line:#2f384a;--ink:#eef2fb;--dim:#8b95ab;--acc:#ffb020;--ok:#2ee6a6;--bad:#ff5b6b;--blue:#4da3ff;--sp:#2ee6a6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,"Segoe UI",Roboto,sans-serif;overflow:hidden;touch-action:manipulation;overscroll-behavior:none}
+button{font-family:inherit;color:inherit;cursor:pointer}
+input{user-select:text;-webkit-user-select:text}
+[hidden]{display:none!important}
+#app{height:100%;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#rot{display:none;position:fixed;inset:0;z-index:99;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:10px;font-size:18px;font-weight:700}
+@media (orientation:portrait){#rot{display:flex}}
+#bar{display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--line)}
+.brand{font-size:15px;font-weight:800;white-space:nowrap}.brand i{font-style:normal;color:var(--acc)}
+#tabs{display:flex;gap:4px;flex:1;justify-content:center}
+.tab{background:none;border:0;padding:7px 18px;border-radius:12px;color:var(--dim);font-size:14px;font-weight:700}
+.tab.on{background:var(--card2);color:var(--ink)}
+#chip{display:flex;align-items:center;gap:7px;background:var(--card);border-radius:14px;padding:6px 11px;font-size:12px;white-space:nowrap}
+#chip i{width:9px;height:9px;border-radius:50%;background:#556}
+#chip.on i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+main{flex:1;min-height:0;position:relative}
+.screen{position:absolute;inset:0;display:none;padding:12px;overflow:auto}
+.screen.on{display:block}
+h2{margin:2px 0 10px;font-size:18px}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-size:15px;font-weight:700;background:var(--card2)}
+.btn.pri{background:var(--acc);color:#1a1200}.btn:disabled{opacity:.35}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+#s-connect>div{max-width:780px;margin:0 auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.conn{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--dim)}
+.conn b{font-size:20px;color:var(--ink)}
+.ic{width:44px;height:44px;border-radius:50%;background:var(--card2);display:grid;place-items:center;margin-bottom:2px;color:var(--acc)}
+.ic svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.conn em{font-style:normal;margin-top:4px;font-weight:700;color:var(--ink)}
+.conn.busy{border-color:var(--acc)}.conn.ok{border-color:var(--ok)}.conn.ok em{color:var(--ok)}.conn.bad{border-color:var(--bad)}.conn.bad em{color:var(--bad)}
+#s-drive{overflow:hidden;padding:10px}
+#s-drive.on{display:grid;grid-template-columns:1fr 1.25fr .5fr;gap:10px}
+.panel{background:var(--card);border-radius:22px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.hint{margin:0;text-align:center;font-size:11px;color:var(--dim)}
+#wz{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;touch-action:none;border-radius:16px;background:radial-gradient(circle at 50% 50%,#222a3a,transparent 70%)}
+#wheel{height:100%;max-width:100%}
+.arr{position:absolute;top:50%;margin-top:-22px;font-size:36px;color:#3a4358;transition:color .1s}
+#aL{left:8px}#aR{right:8px}.arr.on{color:var(--acc)}
+#ga{align-items:center}
+#gauge{flex:1;min-height:0;width:100%;touch-action:none}
+.mb{display:grid;grid-template-columns:auto 1fr 38px;gap:6px;align-items:center;font-size:11px;color:var(--dim)}
+.mb div{height:8px;border-radius:4px;background:var(--deep);overflow:hidden}.mb i{display:block;height:100%;width:0}
+.mb b{color:var(--ink);text-align:right}
+#mbs{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
+#ctl{display:grid;grid-template-columns:repeat(3,1fr) 1.4fr;gap:6px;width:100%}
+.gear{background:var(--deep);border:0;border-radius:14px;height:44px;font-size:19px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.gear small{font-size:9px;font-weight:600;color:var(--dim);margin-top:2px}
+.gear.on{color:#10121a}.gear.on small{color:#10121a}
+.gear.on[data-g=D]{background:var(--ok)}.gear.on[data-g=N]{background:#c9cfdd}.gear.on[data-g=R]{background:var(--bad)}
+#stop{border:0;border-radius:14px;height:44px;background:var(--bad);color:#fff;font-size:17px;font-weight:800;box-shadow:0 4px 0 #8f2430}
+#stop:active{transform:translateY(3px);box-shadow:0 1px 0 #8f2430}
+#th{align-items:center}
+#lever{flex:1;min-height:0;width:100%;display:flex;justify-content:center;touch-action:none}
+.lt{position:relative;width:58px;height:calc(100% - 28px);margin:14px 0}
+.lc{position:absolute;inset:0;border-radius:29px;overflow:hidden;background:var(--deep)}
+#lf{position:absolute;left:0;right:0;bottom:0;height:0}
+#lk{position:absolute;left:50%;width:74px;height:30px;margin-left:-37px;transform:translateY(50%);border-radius:12px;background:var(--ink);box-shadow:0 3px 0 #8b95ab;bottom:0}
+#spd{width:100%;border:0;border-radius:14px;height:44px;font-size:13px;font-weight:800;background:var(--sp);color:#10121a;line-height:1.1}
+#spd small{display:block;font-size:9px;font-weight:600}
+#nolink{position:absolute;inset:0;background:#11141bdd;display:flex;align-items:center;justify-content:center;z-index:5}
+#nolink .panel{align-items:center;text-align:center;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;max-width:900px;margin:0 auto}
+.box{background:var(--card);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.box h3{margin:0;font-size:15px}.box p{margin:0;font-size:12px;color:var(--dim);line-height:1.4}
+.box.tg{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}
+.seg{display:flex;background:var(--deep);border-radius:12px;padding:3px}
+.seg button{flex:1;border:0;background:none;color:var(--dim);padding:9px 2px;border-radius:10px;font-size:12px;font-weight:700}
+.seg button.on{background:var(--acc);color:#1a1200}
+.box input[type=text]{background:var(--deep);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px;font-size:15px;width:100%}
+.box input[type=range]{width:100%;accent-color:var(--acc)}
+.sw{flex:none;width:52px;height:30px;border-radius:15px;background:var(--deep);border:0;position:relative}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--dim);transition:.15s}
+.sw[aria-checked=true]{background:var(--ok)}.sw[aria-checked=true]::after{left:25px;background:#fff}
+@media (max-height:460px){.brand{font-size:14px}.tab{padding:5px 14px}.conn{padding:10px 14px}.ic{display:none}h2{margin:0 0 8px}}
+</style>
+</head>
+<body>
+<div id="rot"><span style="font-size:42px">⟳</span>หมุนมือถือเป็นแนวนอน</div>
+<div id="app">
+<header id="bar">
+  <b class="brand">THEPKUB <i>4WD</i></b>
+  <nav id="tabs">
+    <button class="tab on" data-go="connect">เชื่อมต่อ</button>
+    <button class="tab" data-go="drive">ขับรถ</button>
+    <button class="tab" data-go="settings">ตั้งค่า</button>
+  </nav>
+  <div id="chip"><i></i><span>ไม่ได้เชื่อมต่อ</span></div>
+</header>
+<main>
+<section class="screen on" id="s-connect"><div>
+  <h2>เลือกวิธีเชื่อมต่อรถ</h2>
+  <div class="two">
+    <button class="conn" id="cWifi">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 9a13 13 0 0118 0M6.5 12.5a8 8 0 0111 0M10 16a3.5 3.5 0 014 0"/><circle cx="12" cy="19.5" r=".8"/></svg></span>
+      <b>Wi‑Fi</b><span>เครือข่าย THEPKUB_4WD_WIFI · รหัส 12345678</span><span id="ipTxt">192.168.4.1</span>
+      <em>แตะเพื่อเชื่อมต่อ</em>
+    </button>
+    <button class="conn" id="cBt">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg></span>
+      <b>Bluetooth</b><span>ต้องจับคู่ในตั้งค่ามือถือก่อน</span><span id="btTxt">THEPKUB_4WD_RC</span>
+      <em>แตะเพื่อเชื่อมต่อ</em>
+    </button>
+  </div>
+  <div class="row">
+    <button class="btn pri" id="goDrive" data-go="drive" disabled>เริ่มขับ</button>
+    <button class="btn" id="demo">ลองหน้าขับ (ไม่ต่อรถ)</button>
+    <button class="btn" id="disc" hidden>ตัดการเชื่อมต่อ</button>
+  </div>
+</div></section>
+
+<section class="screen" id="s-drive">
+  <div class="panel" id="st">
+    <div id="wz">
+      <span class="arr" id="aL">◀</span><span class="arr" id="aR">▶</span>
+      <svg id="wheel" viewBox="0 0 200 200" aria-label="พวงมาลัย">
+        <g id="wg">
+          <circle cx="100" cy="100" r="84" fill="none" stroke="#3a4358" stroke-width="16"/>
+          <circle cx="100" cy="100" r="84" fill="none" stroke="#4a5472" stroke-width="3" opacity=".7"/>
+          <path d="M20 108H78M122 108H180M100 126V184" stroke="#3a4358" stroke-width="14" stroke-linecap="round"/>
+          <circle cx="100" cy="104" r="26" fill="#262d3c" stroke="#4a5472" stroke-width="3"/>
+          <rect x="92" y="10" width="16" height="22" rx="5" fill="#ffb020"/>
+        </g>
+      </svg>
+    </div>
+    <p class="hint">แตะแล้วลากซ้าย/ขวาเพื่อเลี้ยว</p>
+  </div>
+
+  <div class="panel" id="ga">
+    <svg id="gauge" viewBox="0 0 300 250" aria-label="เกจคันเร่งมอเตอร์">
+      <path id="track" fill="none" stroke="#0d1016" stroke-width="22" stroke-linecap="round"/>
+      <path id="fill" fill="none" stroke-width="22" stroke-linecap="round"/>
+      <g id="ticks" stroke="#8b95ab" fill="#8b95ab" font-size="11" text-anchor="middle" font-family="system-ui,sans-serif"></g>
+      <g id="needle"><line x1="150" y1="135" x2="150" y2="52" stroke="#eef2fb" stroke-width="5" stroke-linecap="round"/><circle cx="150" cy="135" r="12" fill="#ffb020"/></g>
+      <text id="val" x="150" y="196" text-anchor="middle" font-size="42" font-weight="800" fill="#eef2fb" font-family="system-ui,sans-serif">0</text>
+      <text x="150" y="216" text-anchor="middle" font-size="11" fill="#8b95ab" font-family="system-ui,sans-serif">คันเร่งมอเตอร์ % · ลากที่เกจได้</text>
+    </svg>
+    <div id="mbs">
+      <div class="mb" id="mL"><span>ซ้าย</span><div><i></i></div><b>0%</b></div>
+      <div class="mb" id="mR"><span>ขวา</span><div><i></i></div><b>0%</b></div>
+    </div>
+    <div id="ctl">
+      <button class="gear on" data-g="D">D<small>หน้า</small></button>
+      <button class="gear" data-g="N">N<small>ว่าง</small></button>
+      <button class="gear" data-g="R">R<small>ถอย</small></button>
+      <button id="stop">STOP</button>
+    </div>
+  </div>
+
+  <div class="panel" id="th">
+    <div id="lever"><div class="lt"><div class="lc"><div id="lf"></div></div><div id="lk"></div></div></div>
+    <button id="spd">NORMAL<small>แตะเพื่อเปลี่ยน</small></button>
+  </div>
+  <div id="nolink" hidden><div class="panel"><b>ยังไม่ได้เชื่อมต่อรถ</b><span style="color:var(--dim);font-size:13px">เลือก Wi‑Fi หรือ Bluetooth ก่อนขับ</span><button class="btn pri" data-go="connect">ไปหน้าเชื่อมต่อ</button></div></div>
+</section>
+
+<section class="screen" id="s-settings">
+  <div class="grid">
+    <div class="box"><h3>ความเร็วสูงสุด</h3><div class="seg"><button data-speed="0">ECO</button><button data-speed="1">NORMAL</button><button data-speed="2">TURBO</button></div><p>ECO นุ่มสำหรับในบ้าน · TURBO แรงสุด</p></div>
+    <div class="box"><h3>ความไวการเลี้ยว: <span id="stV">70</span>%</h3><input type="range" id="stR" min="30" max="100" step="5"><p>ยิ่งสูง รถยิ่งเลี้ยวหักเร็ว</p></div>
+    <div class="box tg"><div><h3>คันเร่งกลับศูนย์</h3><p>ปล่อยนิ้วแล้วคันเร่งลงเป็น 0 เอง (แนะนำ) · ปิด = ค้างค่าไว้</p></div><button class="sw" role="switch" data-t="auto"></button></div>
+    <div class="box tg"><div><h3>สั่นเมื่อกดปุ่ม</h3><p>สั่นเบา ๆ ตอนกดเกียร์/ความเร็ว</p></div><button class="sw" role="switch" data-t="vib"></button></div>
+    <div class="box"><h3>IP ของรถ (Wi‑Fi)</h3><input type="text" id="ipI" inputmode="decimal" autocomplete="off"><p>ค่าเริ่มต้น 192.168.4.1</p></div>
+    <div class="box"><h3>ชื่อ Bluetooth ของรถ</h3><input type="text" id="btI" autocomplete="off"><p>ต้องตรงกับชื่อที่จับคู่ไว้ในมือถือ</p></div>
+    <div class="box"><h3>ระบบหยุดฉุกเฉิน</h3><p>ถ้าสัญญาณหายเกิน 1.5 วินาที รถจะหยุดเอง (ตั้งไว้ในบอร์ด)</p></div>
+    <div class="box"><h3>คืนค่าเริ่มต้น</h3><button class="btn" id="reset">รีเซ็ตการตั้งค่า</button></div>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const DEF = { speed: 1, steer: 70, auto: true, vib: true, ip: '192.168.4.1', bt: 'THEPKUB_4WD_RC' };
+let cfg = { ...DEF };
+try { Object.assign(cfg, JSON.parse(localStorage.getItem('thepkub') || '{}')); } catch {}
+const save = () => { try { localStorage.setItem('thepkub', JSON.stringify(cfg)); } catch {} };
+const buzz = () => cfg.vib && navigator.vibrate && navigator.vibrate(10);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const native = () => window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CarLink;
+const SP = [['ECO', '#4da3ff'], ['NORMAL', '#2ee6a6'], ['TURBO', '#ff5b6b']];
+
+let link = null, cur = 'connect', gear = 'D', thr = 0, str = 0, gaugeDown = false, leverDown = false, wheelDown = false, sentSpeed = -1, busy = false, fails = 0;
+
+function go(n) {
+  cur = n;
+  $$('.screen').forEach(s => s.classList.toggle('on', s.id === 's-' + n));
+  $$('.tab').forEach(t => t.classList.toggle('on', t.dataset.go === n));
+  refresh();
+}
+$$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+function refresh() {
+  const names = { wifi: 'Wi‑Fi เชื่อมต่อแล้ว', bt: 'Bluetooth เชื่อมต่อแล้ว', demo: 'โหมดทดลอง' };
+  $('#chip span').textContent = link ? names[link] : 'ไม่ได้เชื่อมต่อ';
+  $('#chip').className = link ? 'on' : '';
+  $('#nolink').hidden = !(cur === 'drive' && !link);
+  $('#goDrive').disabled = !link;
+  $('#disc').hidden = !link;
+}
+function card(m, st, txt) { const c = $(m === 'wifi' ? '#cWifi' : '#cBt'); c.className = 'conn ' + st; c.querySelector('em').textContent = txt; }
+function drop() { if (link === 'bt' && native()) native().disconnect().catch(() => {}); link = null; sentSpeed = -1; fails = 0; thr = 0; str = 0; }
+function linked(m) { link = m; sentSpeed = -1; fails = 0; card(m, 'ok', 'เชื่อมต่อแล้ว'); refresh(); setTimeout(() => cur === 'connect' && go('drive'), 600); }
+
+$('#cWifi').addEventListener('click', async () => {
+  drop(); card('bt', '', 'แตะเพื่อเชื่อมต่อ'); card('wifi', 'busy', 'กำลังเชื่อมต่อ…'); refresh();
+  const ac = new AbortController(), to = setTimeout(() => ac.abort(), 3000);
+  try {
+    if (native()) await native().bindWifi().catch(() => {});
+    const r = await fetch(`http://${cfg.ip}/ping`, { signal: ac.signal, cache: 'no-store' });
+    if (!r.ok) throw 0; linked('wifi');
+  } catch { card('wifi', 'bad', 'ไม่พบรถ — ต่อ Wi‑Fi THEPKUB_4WD_WIFI ในตั้งค่ามือถือก่อน (ถ้ายังไม่ได้ ลองปิดเน็ตมือถือ)'); }
+  clearTimeout(to);
+});
+$('#cBt').addEventListener('click', async () => {
+  drop(); card('wifi', '', 'แตะเพื่อเชื่อมต่อ'); card('bt', 'busy', 'กำลังเชื่อมต่อ…'); refresh();
+  const p = native();
+  if (!p) return card('bt', 'bad', 'Bluetooth ใช้ได้ในแอป APK เท่านั้น');
+  try {
+    const { devices } = await p.list();
+    const d = devices.find(x => x.name === cfg.bt);
+    if (!d) return card('bt', 'bad', `ไม่พบ ${cfg.bt} — จับคู่ในตั้งค่า Bluetooth ของมือถือก่อน`);
+    await p.connect({ address: d.address }); linked('bt');
+  } catch (e) { card('bt', 'bad', (e && e.message) || 'เชื่อมต่อไม่สำเร็จ'); }
+});
+if (native() && native().addListener) native().addListener('disconnected', () => { if (link === 'bt') { drop(); card('bt', 'bad', 'หลุดการเชื่อมต่อ'); refresh(); } });
+$('#demo').addEventListener('click', () => { drop(); link = 'demo'; refresh(); go('drive'); });
+$('#disc').addEventListener('click', () => { send('S'); drop(); card('wifi', '', 'แตะเพื่อเชื่อมต่อ'); card('bt', '', 'แตะเพื่อเชื่อมต่อ'); refresh(); });
+
+async function send(c) {
+  if (link === 'wifi') {
+    if (busy && c !== 'S') return; busy = true;
+    const ac = new AbortController(), to = setTimeout(() => ac.abort(), 700);
+    try { await fetch(`http://${cfg.ip}/cmd?c=${encodeURIComponent(c)}`, { signal: ac.signal, cache: 'no-store' }); fails = 0; }
+    catch { if (++fails >= 3) { drop(); card('wifi', 'bad', 'สัญญาณหาย — เชื่อมต่อใหม่'); refresh(); } }
+    clearTimeout(to); busy = false;
+  } else if (link === 'bt') {
+    native().write({ data: c + '\n' }).catch(() => { drop(); card('bt', 'bad', 'หลุดการเชื่อมต่อ'); refresh(); });
+  }
+}
+
+function out() {
+  const t = gear === 'D' ? thr : gear === 'R' ? -thr : 0;
+  const s = str * cfg.steer / 100;
+  const l = t + s, r = t - s, m = Math.max(1, Math.abs(l), Math.abs(r));
+  return [l / m * 100, r / m * 100];
+}
+setInterval(() => {
+  if (link !== 'wifi' && link !== 'bt') return;
+  if (sentSpeed !== cfg.speed) { sentSpeed = cfg.speed; send(String(cfg.speed + 1)); return; }
+  const [l, r] = out(); send(`M${Math.round(l)},${Math.round(r)}`);
+}, 200);
+
+const CX = 150, CY = 135, R = 110, g = $('#gauge');
+const P = (a, r) => [CX + r * Math.sin(a * Math.PI / 180), CY - r * Math.cos(a * Math.PI / 180)];
+const arc = (a1, a2, r) => { const p = P(a1, r), q = P(a2, r); return `M${p[0].toFixed(1)} ${p[1].toFixed(1)}A${r} ${r} 0 ${a2 - a1 > 180 ? 1 : 0} 1 ${q[0].toFixed(1)} ${q[1].toFixed(1)}`; };
+$('#track').setAttribute('d', arc(-120, 120, R));
+$('#ticks').innerHTML = Array.from({ length: 11 }, (_, i) => {
+  const a = -120 + i * 24, p = P(a, R - 18), q = P(a, R - (i % 5 ? 28 : 34)), t = P(a, R - 46);
+  return `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke-width="${i % 5 ? 1.5 : 3}"/>` + (i % 2 ? '' : `<text x="${t[0]}" y="${t[1] + 4}" stroke="none">${i * 10}</text>`);
+}).join('');
+function gset(e) {
+  const r = g.getBoundingClientRect(), sc = Math.min(r.width / 300, r.height / 250);
+  const cx = r.left + (r.width - 300 * sc) / 2 + CX * sc, cy = r.top + (r.height - 250 * sc) / 2 + CY * sc;
+  let a = Math.atan2(e.clientX - cx, -(e.clientY - cy)) * 180 / Math.PI;
+  if (a > 120 || a < -120) a = thr > .5 ? 120 : -120;
+  thr = (a + 120) / 240; if (thr < .03) thr = 0;
+}
+g.addEventListener('pointerdown', e => { e.preventDefault(); g.setPointerCapture(e.pointerId); gaugeDown = true; gset(e); });
+g.addEventListener('pointermove', e => gaugeDown && gset(e));
+['pointerup', 'pointercancel'].forEach(t => g.addEventListener(t, () => gaugeDown = false));
+
+const lv = $('#lever'), lt = $('.lt');
+function lset(e) { const r = lt.getBoundingClientRect(); thr = clamp(1 - (e.clientY - r.top) / r.height, 0, 1); if (thr < .04) thr = 0; if (thr > .96) thr = 1; }
+lv.addEventListener('pointerdown', e => { e.preventDefault(); lv.setPointerCapture(e.pointerId); leverDown = true; lset(e); });
+lv.addEventListener('pointermove', e => leverDown && lset(e));
+['pointerup', 'pointercancel'].forEach(t => lv.addEventListener(t, () => leverDown = false));
+
+const wz = $('#wz'); let x0 = 0;
+wz.addEventListener('pointerdown', e => { e.preventDefault(); wz.setPointerCapture(e.pointerId); wheelDown = true; x0 = e.clientX; str = 0; });
+wz.addEventListener('pointermove', e => {
+  if (!wheelDown) return;
+  str = clamp((e.clientX - x0) / Math.max(60, Math.min(120, wz.clientWidth * .35)), -1, 1);
+  if (Math.abs(str) < .06) str = 0;
+});
+['pointerup', 'pointercancel'].forEach(t => wz.addEventListener(t, () => wheelDown = false));
+
+$$('.gear').forEach(b => b.addEventListener('click', () => { gear = b.dataset.g; thr = 0; buzz(); }));
+$('#stop').addEventListener('pointerdown', () => { thr = 0; str = 0; gear = 'N'; buzz(); send('S'); });
+$('#spd').addEventListener('click', () => { cfg.speed = (cfg.speed + 1) % 3; save(); render(); buzz(); });
+window.addEventListener('blur', () => { gaugeDown = leverDown = wheelDown = false; thr = 0; str = 0; });
+
+$$('[data-speed]').forEach(b => b.addEventListener('click', () => { cfg.speed = +b.dataset.speed; save(); render(); buzz(); }));
+$('#stR').addEventListener('input', e => { cfg.steer = +e.target.value; save(); render(); });
+$$('.sw').forEach(b => b.addEventListener('click', () => { cfg[b.dataset.t] = !cfg[b.dataset.t]; save(); render(); }));
+$('#ipI').addEventListener('change', e => { cfg.ip = e.target.value.trim() || DEF.ip; save(); render(); });
+$('#btI').addEventListener('change', e => { cfg.bt = e.target.value.trim() || DEF.bt; save(); render(); });
+$('#reset').addEventListener('click', () => { cfg = { ...DEF }; save(); render(); });
+function render() {
+  $$('[data-speed]').forEach(b => b.classList.toggle('on', +b.dataset.speed === cfg.speed));
+  $('#stR').value = cfg.steer; $('#stV').textContent = cfg.steer;
+  $$('.sw').forEach(b => b.setAttribute('aria-checked', !!cfg[b.dataset.t]));
+  $('#ipI').value = cfg.ip; $('#btI').value = cfg.bt;
+  $('#ipTxt').textContent = cfg.ip; $('#btTxt').textContent = cfg.bt;
+  const [n, c] = SP[cfg.speed];
+  $('#spd').firstChild.textContent = n; document.documentElement.style.setProperty('--sp', c);
+}
+
+function mb(k, x) { const i = $(`#m${k} i`); i.style.width = Math.abs(x) + '%'; i.style.background = x < 0 ? 'var(--bad)' : 'var(--ok)'; $(`#m${k} b`).textContent = Math.round(x) + '%'; }
+setInterval(() => {
+  if (!(gaugeDown || leverDown) && cfg.auto && thr > 0) thr = Math.max(0, thr - .1);
+  if (!wheelDown && str !== 0) str = Math.abs(str) < .12 ? 0 : str - Math.sign(str) * .12;
+  const a = -120 + thr * 240, col = `hsl(${200 - 200 * thr} 90% 58%)`, f = $('#fill');
+  f.setAttribute('d', thr > .005 ? arc(-120, a, R) : ''); f.style.stroke = col;
+  $('#needle').setAttribute('transform', `rotate(${a} ${CX} ${CY})`);
+  $('#val').textContent = Math.round(thr * 100);
+  $('#lf').style.height = thr * 100 + '%'; $('#lf').style.background = col; $('#lk').style.bottom = thr * 100 + '%';
+  $('#wg').setAttribute('transform', `rotate(${str * 100} 100 100)`);
+  $('#aL').classList.toggle('on', str < -.1); $('#aR').classList.toggle('on', str > .1);
+  const [l, r] = out(); mb('L', l); mb('R', r);
+  $$('.gear').forEach(b => b.classList.toggle('on', b.dataset.g === gear));
+}, 50);
+
+render(); refresh();
+})();
+</script>
+</body>
+</html>
